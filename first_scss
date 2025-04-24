@@ -1,0 +1,45 @@
+ <Container fluid className="mt-3 deals-table-container"> // Add class here
+    {/* ... */}
+    <Stack direction="horizontal" /* ... */ className="mb-2 pb-2 border-bottom ... deals-toolbar"> // Add class here
+       {/* ... */}
+    </Stack>
+    {/* ... */}
+    <Table striped bordered hover responsive size="sm" className="deals-table"> {/* Add class here */}
+        {/* ... */}
+                                <Button
+                                    variant="link"
+                                    size="sm"
+                                    className="p-0 mx-1 text-primary type-info-button" // Add class here
+                                    onClick={() => handleShowHistoryModal(deal)}
+                                    // ...
+                                >
+                                    <InfoCircleFill size={14}/>
+                                </Button>
+        {/* ... */}
+                                <Button
+                                    variant="link"
+                                    className="p-0 action-button confirm-action" // Add classes here
+                                    onClick={() => handleShowCommentModal(deal.id)}
+                                    // ...
+                                >
+                                    <CheckCircleFill color="green" style={{ cursor: 'pointer' }} />
+                                </Button>
+                                <Button
+                                    variant="link"
+                                    className="p-0 action-button cancel-action" // Add classes here
+                                    // ...
+                                >
+                                     <XCircleFill color="red" style={{ cursor: 'pointer' }}/>
+                                </Button>
+         {/* ... */}
+         {/* In History Modal */}
+         <Table striped bordered hover size="sm" className="history-modal-table"> {/* Add class here */}
+             {/* ... */}
+         </Table>
+         {/* ... */}
+          {/* In Comment Modal */}
+          <Form.Text muted className="d-block text-end comment-char-counter"> {/* Add class here */}
+              {maxCommentLength - commentText.length} restant(s)
+          </Form.Text>
+          {/* ... */}
+ </Container>
