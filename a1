@@ -303,11 +303,10 @@ const DealsTable = () => {
 
     // --- AgGrid Default Column Definition ---
     const defaultColDef = useMemo(() => ({
-        sortable: true,
-        filter: true,
+        sortable: false,
+            filter: false,
         resizable: true,
-        minWidth: 120,
-        floatingFilter: true,
+        minWidth: 120
     }), []);
 
     // --- AgGrid context for cell renderers ---
