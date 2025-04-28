@@ -1,1 +1,185 @@
 
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom styles for the legend popover */
+.legend-popover.popover {
+  background-color: white;
+  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  max-width: 300px;
+}
+
+.legend-popover .popover-header {
+  background-color: white;
+  border-bottom: none;
+  font-size: 16px;
+  padding-bottom: 0;
+}
+
+.legend-popover .popover-body {
+  padding-top: 0;
+}
+
+.legend-popover .popover-body ul {
+  margin-bottom: 0.5rem;
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+  font-size: 14px;
+}
+
+.legend-popover .popover-arrow::after {
+  border-bottom-color: white;
+}
+
+/* AG Grid Custom Styles */
+.ag-theme-alpine {
+  --ag-header-height: 30px;
+  --ag-header-foreground-color: white;
+  --ag-header-background-color: #dc3545;
+  --ag-header-cell-hover-background-color: #c82333;
+  --ag-header-cell-moving-background-color: #c82333;
+  width: 100%;
+  height: 100vh;
+  min-height: 800px;
+}
+
+.ag-theme-alpine .ag-header {
+  background-color: #080505 !important;
+  color: rgb(0, 0, 0) !important;
+  border-bottom: 1px solid #000000;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.ag-theme-alpine .ag-header-cell-label {
+  color: rgb(255, 255, 255) !important;
+  font-weight: bold;
+
+}
+
+.ag-theme-alpine .ag-header-cell::after,
+.ag-theme-alpine .ag-header-group-cell::after {
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.ag-theme-alpine .ag-cell {
+  line-height: 1.5;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+.ag-theme-alpine .comment-row {
+  background-color: #f0f0d8 !important;
+  font-style: italic;
+}
+
+.ag-theme-alpine .ag-master-cell {
+  display: flex;
+  align-items: center;
+}
+
+.ag-theme-alpine .ag-root-wrapper {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+}
+
+.ag-theme-alpine .ag-row-hover {
+  background-color: #d9d9d983 !important;
+}
+
+.ag-theme-alpine .ag-row-even {
+  background-color: #e6e6e6;
+}
+
+/* Cell Styles */
+.cell-text-right {
+  text-align: right;
+}
+
+.cell-pre-line {
+  white-space: pre-line;
+}
+
+/* Comment Styles */
+.comment-text {
+  font-style: italic;
+}
+
+.comment-textarea {
+  background-color: #f0f0d8;
+}
+
+/* Icon Styles */
+.help-cursor {
+  cursor: help;
+}
+
+.action-icon {
+  cursor: pointer;
+}
+
+.action-icon-green {
+  color: green;
+}
+
+.action-icon-red {
+  color: red;
+}
+
+/* Modal Styles */
+.modal-history-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Table Styles */
+.table-cell-wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Grid Container */
+.grid-container {
+  width: 100%;
+  height: 100vh;
+  min-height: 800px;
+}
