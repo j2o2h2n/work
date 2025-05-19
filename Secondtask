@@ -1,0 +1,389 @@
+import React from 'react';
+import { AgGridReact } from 'ag-grid-react';
+import { Container, Card, ListGroup } from 'react-bootstrap';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import './FXPositionTable.scss';
+
+const fxData = [
+  {
+    "Devise": "AED",
+    "PositionComptable": 10809.12,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 10809.12,
+    "PositionCambiste": 10809.10,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 10809.10,
+    "Total": 10809.10,
+    "TotalEUR": -0.10,
+    "SYMPositionLibre": -0.02,
+    "GLPositionLibre": 0.03,
+    "TotalPositionLibre": 0.03
+  },
+  {
+    "Devise": "ARS",
+    "PositionComptable": 0.0,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 0.0,
+    "PositionCambiste": 0.0,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 0.0,
+    "Total": 0.0,
+    "TotalEUR": 0.0,
+    "SYMPositionLibre": 0.0,
+    "GLPositionLibre": 964.29,
+    "TotalPositionLibre": 964.29
+  },
+  {
+    "Devise": "AUD",
+    "PositionComptable": 2703.33,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 2703.33,
+    "PositionCambiste": 2708.67,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 2708.67,
+    "Total": 8.63,
+    "TotalEUR": 5.34,
+    "SYMPositionLibre": 858.44,
+    "GLPositionLibre": -0.03,
+    "TotalPositionLibre": 858.41
+  },
+  {
+    "Devise": "BGN",
+    "PositionComptable": 9388.79,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 9388.79,
+    "PositionCambiste": 9388.79,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 9388.79,
+    "Total": 0.0,
+    "TotalEUR": 0.0,
+    "SYMPositionLibre": 0.0,
+    "GLPositionLibre": 0.01,
+    "TotalPositionLibre": 0.01
+  },
+  {
+    "Devise": "BRL",
+    "PositionComptable": 0.0,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 0.0,
+    "PositionCambiste": 0.0,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 0.0,
+    "Total": 0.0,
+    "TotalEUR": 0.0,
+    "SYMPositionLibre": 0.0,
+    "GLPositionLibre": 0.0,
+    "TotalPositionLibre": 0.0
+  },
+  {
+    "Devise": "CAD",
+    "PositionComptable": -10649.41,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": -10649.41,
+    "PositionCambiste": -10852.03,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": -10852.03,
+    "Total": -304.92,
+    "TotalEUR": -202.62,
+    "SYMPositionLibre": 107.56,
+    "GLPositionLibre": 5.99,
+    "TotalPositionLibre": 113.57
+  },
+  {
+    "Devise": "CHF",
+    "PositionComptable": -3577.07,
+    "AjustementComptable": 99896.56,
+    "PositionComptableAjustee": 96319.49,
+    "PositionCambiste": -6804.77,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": -6804.77,
+    "Total": -97323.52,
+    "TotalEUR": -103124.26,
+    "SYMPositionLibre": -245.84,
+    "GLPositionLibre": 616.71,
+    "TotalPositionLibre": 370.87
+  },
+  {
+    "Devise": "CNY",
+    "PositionComptable": 2387.41,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 2387.41,
+    "PositionCambiste": 2349.95,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 2349.95,
+    "Total": -293.65,
+    "TotalEUR": -37.46,
+    "SYMPositionLibre": 0.0,
+    "GLPositionLibre": 0.0,
+    "TotalPositionLibre": 0.0
+  },
+  {
+    "Devise": "CZK",
+    "PositionComptable": 19878.12,
+    "AjustementComptable": 0.0,
+    "PositionComptableAjustee": 19878.12,
+    "PositionCambiste": 19318.00,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": 19318.00,
+    "Total": -14073.77,
+    "TotalEUR": -560.12,
+    "SYMPositionLibre": 0.0,
+    "GLPositionLibre": 0.02,
+    "TotalPositionLibre": 0.02
+  },
+  {
+    "Devise": "DKK",
+    "PositionComptable": -505.78,
+    "AjustementComptable": 49.12,
+    "PositionComptableAjustee": -456.66,
+    "PositionCambiste": -467.48,
+    "AjustementFO": 0.0,
+    "PositionCambisteAjustee": -467.48,
+    "Total": -80.86,
+    "TotalEUR": -10.32,
+    "SYMPositionLibre": 5.64,
+    "GLPositionLibre": -0.04,
+    "TotalPositionLibre": -5.68
+  },
+  {
+    "Devise": "AED",
+    "PositionComptable": 10809.12,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 10809.12,
+    "PositionCambiste": 10809.10,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 10809.10,
+    "Total": -0.10,
+    "TotalEUR": -0.02,
+    "SYMPositionLibre": 0.03,
+    "GLPositionLibre": 0.02,
+    "TotalPositionLibre": 0.03
+  },
+  {
+    "Devise": "ARS",
+    "PositionComptable": 0.00,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 0.00,
+    "PositionCambiste": 0.00,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 0.00,
+    "Total": 0.00,
+    "TotalEUR": 0.00,
+    "SYMPositionLibre": 964.29,
+    "GLPositionLibre": 0.00,
+    "TotalPositionLibre": 964.29
+  },
+  {
+    "Devise": "AUD",
+    "PositionComptable": 2703.33,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 2703.33,
+    "PositionCambiste": 2708.67,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 2708.67,
+    "Total": 8.63,
+    "TotalEUR": 5.34,
+    "SYMPositionLibre": 858.44,
+    "GLPositionLibre": -0.03,
+    "TotalPositionLibre": 858.41
+  },
+  {
+    "Devise": "BGN",
+    "PositionComptable": 9388.79,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 9388.79,
+    "PositionCambiste": 9388.79,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 9388.79,
+    "Total": 0.00,
+    "TotalEUR": 0.00,
+    "SYMPositionLibre": 0.00,
+    "GLPositionLibre": 0.01,
+    "TotalPositionLibre": 0.01
+  },
+  {
+    "Devise": "BRL",
+    "PositionComptable": 0.00,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 0.00,
+    "PositionCambiste": 0.00,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 0.00,
+    "Total": 0.00,
+    "TotalEUR": 0.00,
+    "SYMPositionLibre": 0.00,
+    "GLPositionLibre": 0.00,
+    "TotalPositionLibre": 0.00
+  },
+  {
+    "Devise": "CAD",
+    "PositionComptable": -10649.41,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": -10649.41,
+    "PositionCambiste": -10852.03,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": -10852.03,
+    "Total": -304.92,
+    "TotalEUR": -202.62,
+    "SYMPositionLibre": 107.56,
+    "GLPositionLibre": 5.99,
+    "TotalPositionLibre": 113.55
+  },
+  {
+    "Devise": "CHF",
+    "PositionComptable": -3577.07,
+    "AjustementComptable": 99898.56,
+    "PositionComptableAjustee": 96321.49,
+    "PositionCambiste": -6804.77,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": -6804.77,
+    "Total": -97323.52,
+    "TotalEUR": -103124.26,
+    "SYMPositionLibre": -245.84,
+    "GLPositionLibre": 616.71,
+    "TotalPositionLibre": 370.87
+  },
+  {
+    "Devise": "CNY",
+    "PositionComptable": 2387.41,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 2387.41,
+    "PositionCambiste": 2349.95,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 2349.95,
+    "Total": -293.65,
+    "TotalEUR": -37.46,
+    "SYMPositionLibre": 0.00,
+    "GLPositionLibre": 0.00,
+    "TotalPositionLibre": 0.00
+  },
+  {
+    "Devise": "CZK",
+    "PositionComptable": 19878.12,
+    "AjustementComptable": 0.00,
+    "PositionComptableAjustee": 19878.12,
+    "PositionCambiste": 19318.08,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": 19318.08,
+    "Total": -14073.77,
+    "TotalEUR": -560.12,
+    "SYMPositionLibre": 0.00,
+    "GLPositionLibre": 0.02,
+    "TotalPositionLibre": 0.02
+  },
+  {
+    "Devise": "DKK",
+    "PositionComptable": -505.78,
+    "AjustementComptable": 49.12,
+    "PositionComptableAjustee": -456.66,
+    "PositionCambiste": -467.48,
+    "AjustementFO": 0.00,
+    "PositionCambisteAjustee": -467.48,
+    "Total": -80.86,
+    "TotalEUR": -10.32,
+    "SYMPositionLibre": 5.64,
+    "GLPositionLibre": -0.04,
+    "TotalPositionLibre": -5.68
+  }
+];
+
+const logs = [
+  '01/Apr/2025 06:29 : ANNULER_VALIDER_POSITION par ABBONDA1',
+  '01/Apr/2025 06:14 : VALIDER_POSITION par ABBONDA1',
+  '26/Feb/2025 06:41 : ANNULER_VALIDER_POSITION par MEHABO01',
+  '26/Feb/2025 06:41 : VALIDER_POSITION par MEHABO01',
+  '26/Feb/2025 06:41 : ANNULER_VALIDER_POSITION par MEHABO01',
+  '26/Feb/2025 06:41 : VALIDER_POSITION par MEHABO01',
+  '26/Feb/2025 06:41 : ANNULER_VALIDER_POSITION par MEHABO01',
+  '26/Feb/2025 06:41 : VALIDER_POSITION par MEHABO01',
+  '01/Jan/2025 05:48 : VALIDER_POSITION par ABBONDA1',
+];
+
+const columnDefs = [
+  {
+    headerName: '', // Empty group for Devise
+    children: [
+      {
+        headerName: 'Devise',
+        field: 'Devise',
+        pinned: 'left',
+        width: 185,
+        cellClassRules: { 'cell-center': () => true },
+        headerClass: 'cell-center',
+      },
+    ],
+  },
+  {
+    headerName: 'Back',
+    headerClass: 'cell-center',
+    children: [
+      { headerName: 'Position\nComptable\n(EUR)', field: 'PositionComptable', type: 'numericColumn', width: 160, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Ajustement\ncomptable\n(EUR)', field: 'AjustementComptable', type: 'numericColumn', width: 170, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Position\ncomptable\najustée\n(EUR)', field: 'PositionComptableAjustee', type: 'numericColumn', width: 170, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+    ],
+  },
+  {
+    headerName: 'Front',
+    headerClass: 'cell-center',
+    children: [
+      { headerName: 'Position\nCambiste\n(EUR)', field: 'PositionCambiste', type: 'numericColumn', width: 160, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Ajustement\nFO\n(EUR)', field: 'AjustementFO', type: 'numericColumn', width: 130, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Position\ncambiste\najustée\n(EUR)', field: 'PositionCambisteAjustee', type: 'numericColumn', width: 170, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+    ],
+  },
+  {
+    headerName: 'Total',
+    headerClass: 'cell-center',
+    children: [
+      { headerName: 'Total', field: 'Total', type: 'numericColumn', width: 100, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Total\nEUR', field: 'TotalEUR', type: 'numericColumn', width: 110, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'SYM\nPosition\nLibre\n(EUR)', field: 'SYMPositionLibre', type: 'numericColumn', width: 160, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'GL\nPosition\nLibre\n(EUR)', field: 'GLPositionLibre', type: 'numericColumn', width: 160, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+      { headerName: 'Total\nPosition\nLibre\n(EUR)', field: 'TotalPositionLibre', type: 'numericColumn', width: 170, valueFormatter: params => params.value?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }), headerClass: 'cell-center' },
+    ],
+  },
+];
+
+const defaultColDef = {
+  resizable: true,
+  sortable: false,
+  filter: false,
+  cellClass: 'cell-right',
+  headerClass: 'header-cell',
+};
+
+const FXPositionTable = () => (
+  <Container fluid className="fx-table-container">
+    <Card className="mt-4 mb-4">
+      <Card.Header as="h5" className="fx-table-title">Position à fin annuelle le 01/Apr/2025 06:29:36 par ABBONDA1</Card.Header>
+      <Card.Body>
+        <div className="ag-theme-alpine fx-ag-grid" style={{ width: '100%', height: '100%' }}>
+          <AgGridReact
+            rowData={fxData}
+            columnDefs={columnDefs}
+            defaultColDef={defaultColDef}
+            domLayout="autoHeight"
+            suppressHorizontalScroll={false}
+            suppressMovableColumns={true}
+            headerHeight={69}
+            rowHeight={36}
+            animateRows={true}
+          />
+        </div>
+      </Card.Body>
+      <Card.Footer>
+        <div className="fx-log-section">
+          <div className="fx-log-title">Dernière action :</div>
+          <ListGroup variant="flush" className="fx-log-list">
+            {logs.map((log, idx) => (
+              <ListGroup.Item key={idx} className="fx-log-item">{log}</ListGroup.Item>
+            ))}
+          </ListGroup>
+        </div>
+      </Card.Footer>
+    </Card>
+  </Container>
+);
+
+export default FXPositionTable; 
