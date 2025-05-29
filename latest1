@@ -196,24 +196,52 @@ const DealsTable = () => {
      * For comment rows, only the 'Montant Achat' column renders the comment (with colSpan), others are empty.
      */
     const columnDefs = useMemo(() => [
-        {
+{
             headerName: 'Type',
             field: 'type',
             minWidth: 100,
             flex: 1,
             cellClass: (params) => params.data.isCommentRow ? 'comment-row' : 'ag-master-cell',
             colSpan: (params) => params.data.isCommentRow ? 1 : 1,
-            cellRenderer: (params) => params.data.isCommentRow ? null : TypeCellRenderer({ data: params.data, context: { handleShowHistoryModal } }),
+            cellRenderer: (params) => {
+                if (params.data.isCommentRow) return null;
+                // Show only the first part after splitting by space (e.g., 'CC', 'TC', etc.)
+                const parts = (params.data.type || '').split(' ');
+                return <span>{parts[0] || ''}</span>;
+            },
         },
         {
-            headerName: 'Reference',
-            field: 'reference',
+            headerName: 'Office',
+            field: 'office',
             minWidth: 100,
             flex: 1,
-            cellClass: 'cell-pre-line',
+            cellClass: (params) => params.data.isCommentRow ? 'comment-row' : '',
             colSpan: (params) => params.data.isCommentRow ? 1 : 1,
-            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+            cellRenderer: (params) => {
+                if (params.data.isCommentRow) return null;
+                // Show F, then (i) button, then A
+                const parts = (params.data.type || '').split(' ');
+                return (
+                    <span>
+                        {parts[1] ? <span>{parts[1]}</span> : ''}
+                        {parts.length === 3 && (
+                            <Button
+                                variant="link"
+                                size="sm"
+                                className="p-0 pb-1 mx-1 text-primary"
+                                onClick={() => handleShowHistoryModal(params.data)}
+                                title={`Show history for ${params.data.reference}`}
+                                aria-label={`Show history for ${params.data.reference}`}
+                            >
+                                <InfoCircleFill size={14} />
+                            </Button>
+                        )}
+                        {parts[2] ? <span>{parts[2]}</span> : ''}
+                    </span>
+                );
+            },
         },
+       
         {
             headerName: 'Contrepartie',
             field: 'contrepartie',
