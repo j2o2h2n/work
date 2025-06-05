@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Container, Badge, Stack, Button, Modal, Form, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import {
     QuestionCircleFill,
@@ -10,7 +10,7 @@ import {
     InfoCircleFill
 } from 'react-bootstrap-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.scss';
+import './App.css';
 // --- AgGrid Imports ---
 import { AgGridReact } from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
@@ -30,26 +30,27 @@ ModuleRegistry.registerModules([
     // ValidationModule
 ]);
 // --- Sample Data (for demonstration) ---
-const sampleHistory = [
-    { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:21' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '22 Apr 2025 01:15:11' },
-    { action: 'ANNULE_SUPPRESSION', commentaire: 'test', utilisateur: 'MEHABOO1', date: '19 Feb 2025 05:20:15' },
-    { action: 'SUPPRESSION', commentaire: 'Test deletion', utilisateur: 'MEHABOO1', date: '18 Feb 2025 08:20:01' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: '2024.06.20: QUITUS team advised: "Team is still busy with the Java upgrade..."', utilisateur: 'MEHABOO1', date: '18 Feb 2025 07:53:15' },
-    { action: 'MODIF_COMMENTAIRE', commentaire: 'Another comment update...', utilisateur: 'ABBONDA1', date: '20 Jun 2024 10:57:05' },
-];
-const dealsData = [
-    { id: '3613012', type: 'CC F A', reference: '3613012', contrepartie: '70788432', dateValeur: '28 Feb 2024', montantAchat: '8.63 EUR', montantVendu: '15.00 NZD N', coursClient: '1.7378180', montantBaseAchat: '8.63', montantBaseVendu: '15.00', coursBase: '1.7378180', etatDateImport: '27/03/24\n0 - \n[1827565]', commentaire: null, history: sampleHistory },
-    { id: '3613059', type: 'CC F A', reference: '3613059', contrepartie: '70788432', dateValeur: '28 Feb 2024', montantAchat: '84,380.21 GBP N', montantVendu: '94,277.38 CHF', coursClient: '1.1172926', montantBaseAchat: '84,380.21', montantBaseVendu: '94,277.38', coursBase: '1.1172926', etatDateImport: '27/03/24\n0 - \n[1827627]', commentaire: '2024.06.20: QUITUS team advised: "Team is still busy with the Java upgrade and multiple vulnerabilities till Sept". Email TS: Tuesday, 11 June, 2024 11:30 AM', history: [] },
-    { id: 'SC076523', type: 'TC F A', reference: '3706694\nSC076523', contrepartie: '', dateValeur: '02 Sep 2024', montantAchat: '2,850.12 EUR', montantVendu: '2,400.92 GBP N', coursClient: '0.8423938', montantBaseAchat: '2,850.12', montantBaseVendu: '2,400.92', coursBase: '0.8423938', etatDateImport: '03/09/24\n5 - \n[1907358]', commentaire: '2024.09.18: reminder sent / 2024.09.19: return of BO amount 681.03 will be spent at the end of the month on their usual process', history: sampleHistory.slice(5, 8) },
-    { id: '3706695', type: 'TT F A', reference: '3706695', contrepartie: '', dateValeur: '02 Sep 2024', montantAchat: '5,887,000.00 GBP N', montantVendu: '6,988,418.01 EUR', coursClient: '0.8423938', montantBaseAchat: '5,887,000.00', montantBaseVendu: '6,988,418.01', coursBase: '0.8423938', etatDateImport: '03/09/24\n0 - \n[1907365]', commentaire: '2024.09.18: reminder sent / 2024.09.19: return of BO amount 681.03 will be spent at the end of the month on their usual process', history: [] },
-    { id: '3710039', type: 'CC F M', reference: '3710039', contrepartie: '70491515', dateValeur: '11 Sep 2024', montantAchat: '366.24 DKK N', montantVendu: '49.08 EUR', coursClient: '7.4621000', montantBaseAchat: '366.24', montantBaseVendu: '49.08', coursBase: '7.4621000', etatDateImport: '09/09/24\n5 - \n[1910243]', commentaire: '2024.09.10: FO deal in VAL status...', history: [] },
-    { id: '3710040', type: 'CC F M', reference: '3710040', contrepartie: '70491515', dateValeur: '11 Sep 2024', montantAchat: '229.94 NOK N', montantVendu: '19.22 EUR', coursClient: '11.9658000', montantBaseAchat: '229.94', montantBaseVendu: '19.22', coursBase: '11.9658000', etatDateImport: '09/09/24\n5 - \n[1910129]', commentaire: '2024.09.10: FO deal in VAL status...', history: [] },
-    { id: 'CC149589', type: 'CC F A', reference: '3712941\nCC149589', contrepartie: '70788432', dateValeur: '18 Sep 2024', montantAchat: '4,499.44 EUR', montantVendu: '5,000.00 USD N', coursClient: '1.1112500', montantBaseAchat: '4,499.44', montantBaseVendu: '5,000.00', coursBase: '1.1112500', etatDateImport: '18/09/24\n5 - \n[1914715]', commentaire: '2024.09.19: FO/BO FX induits...', history: [] },
-];
+// const sampleHistory = [
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:22' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '23 Apr 2025 09:05:21' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '', utilisateur: 'MEHABOO1', date: '22 Apr 2025 01:15:11' },
+//     { action: 'ANNULE_SUPPRESSION', commentaire: 'test', utilisateur: 'MEHABOO1', date: '19 Feb 2025 05:20:15' },
+//     { action: 'SUPPRESSION', commentaire: 'Test deletion', utilisateur: 'MEHABOO1', date: '18 Feb 2025 08:20:01' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: '2024.06.20: QUITUS team advised: "Team is still busy with the Java upgrade..."', utilisateur: 'MEHABOO1', date: '18 Feb 2025 07:53:15' },
+//     { action: 'MODIF_COMMENTAIRE', commentaire: 'Another comment update...', utilisateur: 'ABBONDA1', date: '20 Jun 2024 10:57:05' },
+// ];
+// const dealsData = [
+//     { id: '3613012', type: 'CC F A', reference: '3613012', contrepartie: '70788432', dateValeur: '28 Feb 2024', montantAchat: '8.63 EUR', montantVendu: '15.00 NZD N', coursClient: '1.7378180', montantBaseAchat: '8.63', montantBaseVendu: '15.00', coursBase: '1.7378180', etatDateImport: '27/03/24\n0 - \n[1827565]', commentaire: null, history: sampleHistory },
+//     { id: '3613059', type: 'CC F A', reference: '3613059', contrepartie: '70788432', dateValeur: '28 Feb 2024', montantAchat: '84,380.21 GBP N', montantVendu: '94,277.38 CHF', coursClient: '1.1172926', montantBaseAchat: '84,380.21', montantBaseVendu: '94,277.38', coursBase: '1.1172926', etatDateImport: '27/03/24\n0 - \n[1827627]', commentaire: '2024.06.20: QUITUS team advised: "Team is still busy with the Java upgrade and multiple vulnerabilities till Sept". Email TS: Tuesday, 11 June, 2024 11:30 AM', history: [] },
+//     { id: 'SC076523', type: 'TC F A', reference: '3706694\nSC076523', contrepartie: '', dateValeur: '02 Sep 2024', montantAchat: '2,850.12 EUR', montantVendu: '2,400.92 GBP N', coursClient: '0.8423938', montantBaseAchat: '2,850.12', montantBaseVendu: '2,400.92', coursBase: '0.8423938', etatDateImport: '03/09/24\n5 - \n[1907358]', commentaire: '2024.09.18: reminder sent / 2024.09.19: return of BO amount 681.03 will be spent at the end of the month on their usual process', history: sampleHistory.slice(5, 8) },
+//     { id: '3706695', type: 'TT F A', reference: '3706695', contrepartie: '', dateValeur: '02 Sep 2024', montantAchat: '5,887,000.00 GBP N', montantVendu: '6,988,418.01 EUR', coursClient: '0.8423938', montantBaseAchat: '5,887,000.00', montantBaseVendu: '6,988,418.01', coursBase: '0.8423938', etatDateImport: '03/09/24\n0 - \n[1907365]', commentaire: '2024.09.18: reminder sent / 2024.09.19: return of BO amount 681.03 will be spent at the end of the month on their usual process', history: [] },
+//     { id: '3710039', type: 'CC F M', reference: '3710039', contrepartie: '70491515', dateValeur: '11 Sep 2024', montantAchat: '366.24 DKK N', montantVendu: '49.08 EUR', coursClient: '7.4621000', montantBaseAchat: '366.24', montantBaseVendu: '49.08', coursBase: '7.4621000', etatDateImport: '09/09/24\n5 - \n[1910243]', commentaire: '2024.09.10: FO deal in VAL status...', history: [] },
+//     { id: '3710040', type: 'CC F M', reference: '3710040', contrepartie: '70491515', dateValeur: '11 Sep 2024', montantAchat: '229.94 NOK N', montantVendu: '19.22 EUR', coursClient: '11.9658000', montantBaseAchat: '229.94', montantBaseVendu: '19.22', coursBase: '11.9658000', etatDateImport: '09/09/24\n5 - \n[1910129]', commentaire: '2024.09.10: FO deal in VAL status...', history: [] },
+//     { id: 'CC149589', type: 'CC F A', reference: '3712941\nCC149589', contrepartie: '70788432', dateValeur: '18 Sep 2024', montantAchat: '4,499.44 EUR', montantVendu: '5,000.00 USD N', coursClient: '1.1112500', montantBaseAchat: '4,499.44', montantBaseVendu: '5,000.00', coursBase: '1.1112500', etatDateImport: '18/09/24\n5 - \n[1914715]', commentaire: '2024.09.19: FO/BO FX induits...', history: [] },
+// ];
+
 const gridOptions = {
     getRowStyle: params => {
         if (params.node.rowIndex % 4 < 2) {
@@ -96,6 +97,20 @@ const DealsTable = () => {
     const orphansToComment = 6;
     const maxCommentLength = 254;
 
+    // --- State for deals data ---
+    const [dealsData, setDealsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        setLoading(true);
+        fetch(process.env.PUBLIC_URL + '/dealsData.json')
+            .then((res) => res.json())
+            .then((data) => {
+                setDealsData(data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
     // --- State for modals and comment input ---
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [selectedDealHistory, setSelectedDealHistory] = useState([]);
@@ -140,16 +155,14 @@ const DealsTable = () => {
         }
     };
 
-    const justificatifDates = ['21/05/25', '23/04/25', '09/04/25', '05/05/25']; // Add as many as you need
-
     /**
      * Expand dealsData so each deal is followed by a comment row.
      * The comment row starts from 'Montant Achat' column and spans to the end.
-     * After every 2 deals, insert a 'justificatif' row similar to the image.
+     * After every 2 deals, insert a 'justificatif' row using the justificatif data from the deal.
      */
     const expandedDealsData = useMemo(() => {
+        if (!dealsData || dealsData.length === 0) return [];
         const rows = [];
-        let justificatifIndex = 0;
         for (let i = 0; i < dealsData.length; i++) {
             rows.push({ ...dealsData[i], isCommentRow: false });
             rows.push({
@@ -159,15 +172,15 @@ const DealsTable = () => {
                 reference: dealsData[i].reference,
             });
             if ((i + 1) % 2 === 0) {
+                const justificatif = dealsData[i].justificatif;
                 rows.push({
                     id: `justificatif-${Math.floor(i / 2)}`,
                     isJustificatifRow: true,
-                    justificatif: 'tickets FO saisi sans marge',
-                    justificatifComment: 'Test Commentaire',
-                    justificatifUser: 'MEHABOO1',
-                    justificatifDate: justificatifDates[justificatifIndex % justificatifDates.length],
+                    justificatif: justificatif.text,
+                    justificatifComment: justificatif.comment,
+                    justificatifUser: justificatif.user,
+                    justificatifDate: justificatif.date,
                 });
-                justificatifIndex++;
             }
         }
         return rows;
@@ -483,6 +496,9 @@ const DealsTable = () => {
             <p className="text-muted mb-2">Nombre de deals: {totalDeals}</p>
 
             {/* AgGrid Table */}
+            {loading ? (
+                <div className="text-center my-5">Chargement des données...</div>
+            ) : (
             <div className="ag-theme-alpine grid-container" style={{ width: '100%', height: '100%' }}>
                 <AgGridReact
                     ref={gridRef}
@@ -504,6 +520,7 @@ const DealsTable = () => {
                     suppressRowVirtualisation={true}
                 />
             </div>
+            )}
 
 
             {/* History Modal */}
