@@ -10,7 +10,7 @@ import {
     InfoCircleFill
 } from 'react-bootstrap-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import './App.scss';
 // --- AgGrid Imports ---
 import { AgGridReact } from 'ag-grid-react';
 import "ag-grid-community/styles/ag-grid.css";
@@ -273,7 +273,9 @@ const DealsTable = () => {
               if (params.data.isJustificatifRow) {
                 return (
                   <span>
-                    <span style={{ color: '#888' }}><strong>Commentaire:</strong>  {params.data.justificatifComment}</span>
+                    <span style={{ fontWeight: 600  }}><strong>Commentaire:</strong>  </span>    {' '}
+                 
+                    <span style={{ fontStyle: 'italic', color: '#555' }}>{params.data.justificatifComment}</span>
                   </span>
                 );
               }
