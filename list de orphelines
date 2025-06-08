@@ -1,3 +1,4 @@
+// line 364
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Container, Badge, Stack, Button, Modal, Form, Table, Popover, OverlayTrigger } from 'react-bootstrap';
 import {
@@ -359,28 +360,46 @@ const DealsTable = () => {
                     ? <span style={{ fontWeight: 600 }}>{params.data.justificatifUser} - {params.data.justificatifDate}</span>
                     : params.value,
         },
+
+        // this is changes made to the table to add the suppression button
         {
             headerName: 'Actions',
             field: 'id',
             minWidth: 100,
             flex: 1,
+            cellClass: 'action-cell',
+            rowSpan: (params) => {
+                // If it's a justificatif row, don't span
+                if (params.data.isJustificatifRow) return 1;
+                // For the first row in each group of 5, span 5 rows
+                if (params.node.rowIndex % 5 === 0) return 5;
+                // For all other rows, don't show the cell
+                return 0;
+            },
             cellRenderer: (params) => {
                 // Only show for main data rows (not comment or justification rows)
                 if (params.data.isCommentRow || params.data.isJustificatifRow) return null;
-                return (
-                    <Button
-                        variant="link"
-                        className="p-0"
-                        onClick={() => {
-                            // Your suppression logic here
-                            alert(`Suppression for ID: ${params.data.id}`);
-                        }}
-                        title="Suppression de l'orphelin"
-                        aria-label="Suppression de l'orphelin"
-                    >
-                        <XOctagonFill className="action-icon action-icon-red" size={16} />
-                    </Button>
-                );
+                
+                // Only show the suppress button for the first row in each group of 5
+                if (params.node.rowIndex % 5 === 0) {
+                    return (
+                        <div className="d-flex align-items-center justify-content-center h-100">
+                            <Button
+                                variant="link"
+                                className="p-0"
+                                onClick={() => {
+                                    // Your suppression logic here
+                                    alert(`Suppression for group starting at ID: ${params.data.id}`);
+                                }}
+                                title="Suppression de l'orphelin"
+                                aria-label="Suppression de l'orphelin"
+                            >
+                                <XOctagonFill className="action-icon action-icon-red" size={16} />
+                            </Button>
+                        </div>
+                    );
+                }
+                return null;
             },
             sortable: false,
             filter: false,
