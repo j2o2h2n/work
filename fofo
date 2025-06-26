@@ -1,0 +1,421 @@
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { Container, Stack, Popover, OverlayTrigger } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+import { AgGridReact } from 'ag-grid-react';
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import { ModuleRegistry } from 'ag-grid-community';
+import { ClientSideRowModelModule, ColumnAutoSizeModule } from 'ag-grid-community';
+import { QuestionCircleFill } from 'react-bootstrap-icons';
+
+ModuleRegistry.registerModules([
+    ClientSideRowModelModule,
+    ColumnAutoSizeModule,
+]);
+
+const gridOptions = {
+    getRowStyle: params => {
+        if (params.node.rowIndex % 4 < 2) {
+            return { 'background': '#f2f2f2' };
+        } else {
+            return { 'background': '#ffffff' };
+        }
+    },
+};
+
+const justificatifOptions = [
+    '[Sélectionner un justificatif]',
+    'deal présent en FO mais absent en BO',
+    'deal présent en BO mais absent en FO',
+    'erreur de sens',
+    'marge négative',
+    'erreur de cours',
+    'divers',
+    'tickets FO saisi sans marge',
+    'orphelin FO non justifié',
+    'écart de montants entre FO et BO',
+    'CAT avec spot de couverture à une patte nulle',
+    'matching manuel sans écart',
+    'rompu sur ordre groupé',
+    'insert/delete pour insérer les données clients',
+];
+
+const DealsTable = () => {
+    const totalDeals = 28;
+    const [dealsData, setDealsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedJustificatif, setSelectedJustificatif] = useState(justificatifOptions[0]);
+    const [comment, setComment] = useState('');
+
+    useEffect(() => {
+        setLoading(true);
+        fetch(process.env.PUBLIC_URL + '/dealsData.json')
+            .then((res) => res.json())
+            .then((data) => {
+                setDealsData(data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    const expandedDealsData = useMemo(() => {
+        if (!dealsData || dealsData.length === 0) return [];
+        const rows = [];
+        for (let i = 0; i < dealsData.length; i++) {
+            rows.push({ ...dealsData[i], isCommentRow: false });
+            rows.push({
+                id: `${dealsData[i].id}-comment`,
+                isCommentRow: true,
+                commentaire: dealsData[i].commentaire,
+                reference: dealsData[i].reference,
+            });
+        }
+        return rows;
+    }, [dealsData]);
+
+    const columnDefs = useMemo(() => [
+        {
+            headerName: 'Type',
+            field: 'type',
+            minWidth: 100,
+            flex: 1,
+            cellClass: (params) =>
+              params.data.isCommentRow ? 'comment-row' : 'ag-master-cell',
+            colSpan: (params) => 1,
+            cellRenderer: (params) => {
+              if (params.data.isCommentRow) return null;
+              const parts = (params.data.type || '').split(' ');
+              return <span>{parts[0] || ''}</span>;
+            },
+          },
+        {
+            headerName: 'Office',
+            field: 'office',
+            minWidth: 100,
+            flex: 1,
+            cellClass: (params) => params.data.isCommentRow ? 'comment-row' : '',
+            colSpan: (params) => 1,
+            cellRenderer: (params) => {
+                if (params.data.isCommentRow) return null;
+                const parts = (params.data.type || '').split(' ');
+                return (
+                    <span>
+                        {parts[1] ? parts[1] : ''}{parts[2] ? ' ' + parts[2] : ''}
+                    </span>
+                );
+            },
+        },
+        {
+            headerName: 'Reference',
+            field: 'reference',
+            minWidth: 100,
+            flex: 1,
+            cellClass: (params) => params.data.isCommentRow ? 'comment-row' : 'cell-pre-line',
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Contrepartie',
+            field: 'contrepartie',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Date de Valeur',
+            field: 'dateValeur',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Montant Achat',
+            field: 'montantAchat',
+            cellClass: (params) =>
+              params.data.isCommentRow ? 'cell-text-right' : 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => params.data.isCommentRow ? 8 : 1,
+            cellRenderer: (params) => {
+              if (params.data.isCommentRow) {
+                return (
+                  <span className="comment-text">
+                    <strong>Commentaire:</strong> {params.data.commentaire || <span className="text-muted">Aucun commentaire</span>}
+                  </span>
+                );
+              }
+              return params.value;
+            },
+          },
+        {
+            headerName: 'Montant Vendu',
+            field: 'montantVendu',
+            cellClass: 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Cours client',
+            field: 'coursClient',
+            cellClass: 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Montant de base Achat',
+            field: 'montantBaseAchat',
+            cellClass: 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Montant de base Vendu',
+            field: 'montantBaseVendu',
+            cellClass: 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: 'Cours base',
+            field: 'coursBase',
+            cellClass: 'cell-text-right',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+        {
+            headerName: "Etat et Date d'import",
+            field: 'etatDateImport',
+            cellClass: 'cell-pre-line',
+            minWidth: 100,
+            flex: 1,
+            colSpan: (params) => 1,
+            cellRenderer: (params) => params.data.isCommentRow ? null : params.value,
+        },
+    ], []);
+
+    const defaultColDef = useMemo(() => ({
+        sortable: false,
+        filter: false,
+        resizable: true,
+        suppressSizeToFit: false,
+        autoSize: true
+    }), []);
+
+    const autoGroupColumnDef = useMemo(() => ({
+        minWidth: 100,
+        flex: 1,
+        suppressSizeToFit: false
+    }), []);
+
+    const gridRef = useRef();
+
+    const popover = (
+        <Popover id="popover" className="legend-popover">
+            <Popover.Body className="px-3 pt-0">
+                <ul>
+                    <li>CC: Change comptant</li>
+                    <li>TC: Change à terme - spot de couverture</li>
+                    <li>TT: Change à terme - partie terme</li>
+                    <li>SW: Swap de change - spot de couverture</li>
+                    <li>GC: Ordre groupe - change comptant</li>
+                    <li>GT: Ordre groupe - change à terme</li>
+                    <li>TF: Transfert</li>
+                    <li>N: Nominal saisie</li>
+                </ul>
+            </Popover.Body>
+        </Popover>
+    );
+
+    const topGridRows = [
+        {
+            id: 'placeholder-1',
+            type: '<Sélectionner une ligne>',
+            reference: '<Sélectionner une ligne>',
+            contrepartie: '<Sélectionner une ligne>',
+            dateValeur: '<Sélectionner une ligne>',
+            montantAchat: '<Sélectionner une ligne>',
+            montantVendu: '<Sélectionner une ligne>',
+            coursClient: '<Sélectionner une ligne>',
+            montantBaseAchat: '<Sélectionner une ligne>',
+            montantBaseVendu: '<Sélectionner une ligne>',
+            coursBase: '<Sélectionner une ligne>',
+            etatDateImport: '<Sélectionner une ligne>',
+            isControlRow: false,
+        },
+        {
+            id: 'placeholder-2',
+            type: '<Sélectionner une ligne>',
+            reference: '<Sélectionner une ligne>',
+            contrepartie: '<Sélectionner une ligne>',
+            dateValeur: '<Sélectionner une ligne>',
+            montantAchat: '<Sélectionner une ligne>',
+            montantVendu: '<Sélectionner une ligne>',
+            coursClient: '<Sélectionner une ligne>',
+            montantBaseAchat: '<Sélectionner une ligne>',
+            montantBaseVendu: '<Sélectionner une ligne>',
+            coursBase: '<Sélectionner une ligne>',
+            etatDateImport: '<Sélectionner une ligne>',
+            isControlRow: false,
+        },
+        {
+            id: 'controls-row',
+            type: '',
+            reference: '',
+            contrepartie: '',
+            dateValeur: '',
+            montantAchat: '',
+            montantVendu: '',
+            coursClient: '',
+            montantBaseAchat: '',
+            montantBaseVendu: '',
+            coursBase: '',
+            etatDateImport: '',
+            isControlRow: true,
+        },
+    ];
+
+    const JustificatifCell = (params) => {
+        if (!params.data.isControlRow || params.colDef.field !== 'type') return params.value;
+        return (
+            <div style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 24,
+                background: '#f8f9fa',
+                padding: '20px 16px',
+                borderRadius: 6,
+                border: '1px solid #e0e0e0',
+                margin: 0
+            }}>
+                <div style={{ minWidth: 220, flex: 1 }}>
+                    <label className="fw-bold mb-1">Justificatif</label>
+                    <select
+                        className="form-select"
+                        value={selectedJustificatif}
+                        onChange={e => setSelectedJustificatif(e.target.value)}
+                    >
+                        {justificatifOptions.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                        ))}
+                    </select>
+                </div>
+                <div style={{ minWidth: 350, flex: 2 }}>
+                    <label className="fw-bold mb-1">Commentaire</label>
+                    <textarea
+                        className="form-control mb-2"
+                        rows={3}
+                        placeholder="Commentaire"
+                        value={comment}
+                        onChange={e => setComment(e.target.value)}
+                        style={{ minWidth: 300, resize: 'vertical', marginBottom: 12 }}
+                    />
+                    <div className="d-flex gap-2 justify-content-end">
+                        <button className="btn btn-danger btn-sm" type="button">Créer Matching</button>
+                        <button className="btn btn-secondary btn-sm" type="button" onClick={() => { setSelectedJustificatif(justificatifOptions[0]); setComment(''); }}>Effacer la sélection</button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const NullCell = (params) => params.data.isControlRow ? null : params.value;
+
+    const topGridColumnDefs = [
+        {
+            headerName: 'Type',
+            field: 'type',
+            minWidth: 120,
+            flex: 1,
+            cellRenderer: JustificatifCell,
+            colSpan: params => params.data.isControlRow ? 11 : 1
+        },
+        { headerName: 'Reference', field: 'reference', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Contrepartie', field: 'contrepartie', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Date de Valeur', field: 'dateValeur', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Montant Achat', field: 'montantAchat', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Montant Vendu', field: 'montantVendu', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Cours client', field: 'coursClient', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Montant de base Achat', field: 'montantBaseAchat', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Montant de base Vendu', field: 'montantBaseVendu', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: 'Cours base', field: 'coursBase', minWidth: 120, flex: 1, cellRenderer: NullCell },
+        { headerName: "Date d'import", field: 'etatDateImport', minWidth: 120, flex: 1, cellRenderer: NullCell },
+    ];
+
+    return (
+        <>
+            <Container fluid className="mt-3 mb-4">
+            <Stack direction="horizontal" gap={3} className="mb-2 pb-2 border-bottom align-items-center justify-content-between flex-wrap">
+                <div className="d-flex align-items-center gap-2 mb-1 mb-md-0">
+                    <OverlayTrigger
+                        trigger={['hover', 'focus']}
+                        placement="bottom"
+                        overlay={popover}
+                    >
+                        <QuestionCircleFill className="help-cursor" />
+                    </OverlayTrigger>
+                    <span>Légende</span>
+                </div>
+                </Stack>
+                <div className="ag-theme-alpine grid-container" style={{ width: '100%', minWidth: 0, overflowX: 'hidden', height: '400px' }}>
+                    <AgGridReact
+                        rowData={topGridRows}
+                        columnDefs={topGridColumnDefs}
+                        defaultColDef={{ resizable: true, flex: 1 }}
+                        headerHeight={38}
+                        rowHeight={60}
+                        suppressMovableColumns={true}
+                        suppressMenuHide={true}
+                        suppressCellFocus={true}
+                        enableCellTextSelection={true}
+                        suppressHorizontalScroll={true}
+                        suppressColumnVirtualisation={true}
+                        suppressRowVirtualisation={true}
+                    />
+                </div>
+            </Container>
+
+            <Container fluid className="mt-4">
+            <p className="text-muted mb-2">Nombre de deals: {totalDeals}</p>
+            {loading ? (
+                <div className="text-center my-5">Chargement des données...</div>
+            ) : (
+                    <div className="ag-theme-alpine grid-container" style={{ width: '100%', height: '390px' }}>
+                <AgGridReact
+                    ref={gridRef}
+                    rowData={expandedDealsData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    autoGroupColumnDef={autoGroupColumnDef}
+                    pagination={true}
+                    paginationPageSize={10}
+                    enableBrowserTooltips={true}
+                    rowSelection="single"
+                    rowHeight={50}
+                    theme={'legacy'}
+                    gridOptions={gridOptions}
+                    suppressHorizontalScroll={true}
+                    suppressColumnVirtualisation={true}
+                    suppressRowVirtualisation={true}
+                />
+            </div>
+            )}
+        </Container>
+        </>
+    );
+};
+
+export default DealsTable;
